@@ -1,2 +1,3 @@
-# js_game_snake
-Simple snake game made from scratch.
+# jsgs
+
+Snake Javascript game example.

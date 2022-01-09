@@ -1,0 +1,11 @@
+version: "3"
+
+services: 
+    a-frame:
+        container_name: game
+        image: nginx:1.14.2-alpine
+        restart: always
+        ports:
+            - "80:80"
+        volumes:
+            - ./:/usr/share/nginx/html:ro
