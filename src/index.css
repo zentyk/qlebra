@@ -16,12 +16,34 @@ body {
 
 #game__score{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content:space-between;
+    width: 400px;
+}
+
+#game__score--title{
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #fff;
 }
 
 #game__score--value{
+    color: #00ffff;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+#game__score--maxTitle{
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+#game__score--maxValue{
     color: #00ffff;
     font-size: 2rem;
     font-weight: 700;

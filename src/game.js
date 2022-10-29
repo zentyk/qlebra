@@ -1,11 +1,24 @@
 let bgm = undefined;
 let velocity = 10;
-window.onload=function() {
-    canv=document.getElementById("gc");
-    bgm =  document.getElementById('bgm');
+window.onload = function(){
+    canv = document.createElement('canvas');
+    canv.id = 'gc';
+    canv.width = 400;
+    canv.height = 400;
+    document.body.appendChild(canv);
     ctx=canv.getContext("2d");
+
+    bgm =  document.getElementById('bgm');
+
+    scoreStorage = new ScoreStorage();
+
     score = 0;
     scoreText = document.getElementById("game__score--value");
+
+    maxScore = scoreStorage.ReadMaxScore();
+    maxScoreText = document.getElementById("game__score--maxValue");
+    maxScoreText.innerHTML = maxScore;
+
     document.addEventListener("keydown",keyPush);
     setInterval(game,1000/velocity);
 }
@@ -61,6 +74,11 @@ function game() {
         tail++;
         score+=1;
         scoreText.innerHTML = score;
+        if(score > maxScore) {
+            maxScore = score;
+            maxScoreText.innerHTML = maxScore;
+            scoreStorage.WriteMaxScore(maxScore);
+        }
 
         //get current canvas rotation and add 10 degrees to it
         if(score>=10) {
@@ -147,6 +165,27 @@ function alterColors(type) {
                 canvas.style.boxShadow = "0 0px 50px #ffff00";
             }
             break;
+    }
+}
+
+class ScoreStorage {
+    constructor() {
+        this.score = 0;
+        this.maxScore = 0;
+        if(typeof (Storage) !== "undefined") {
+            this.ReadMaxScore();
+        } else {
+            alert("Sorry! No Web Storage support..");
+        }
+    }
+
+    WriteMaxScore(maxScore) {
+        localStorage.setItem("maxScore",maxScore);
+    }
+
+    ReadMaxScore(){
+        this.maxScore = localStorage.getItem("maxScore");
+        return this.maxScore;
     }
 }
 
