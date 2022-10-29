@@ -1,3 +1,3 @@
-# jsgs
+# SNAKE
 
-Snake Javascript game example.
+A simple snake game written in JavaScript.
