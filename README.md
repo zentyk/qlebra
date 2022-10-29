@@ -8,4 +8,4 @@ A simple snake game written in JavaScript.
 
 ## How to play
 
-* Use the arrow keys to move the snake
+* Use the arrow keys to move the snake.
