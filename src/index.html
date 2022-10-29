@@ -8,9 +8,16 @@
     <title>Zenty.dev | Qlebra.js </title>
 </head>
 <body>
-    <span class="game__score--title">Score</span>
-    <span id="game__score--value">0</span>
-    <canvas id="gc" width="400" height="400"></canvas>
+    <span id="game__score">
+        <div id="game__score--current">
+            <span id="game__score--title">Score: </span>
+            <span id="game__score--value">0</span>
+        </div>
+        <div id="game__score--high">
+            <span id="game__score--maxTitle">High Score: </span>
+            <span id="game__score--maxValue">0</span>
+        </div>
+    </span>
     <audio id="bgm" src="./solve-the-puzzle.mp3"></audio>
     <script src="./game.js"></script>
 </body>
