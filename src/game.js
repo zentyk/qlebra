@@ -21,6 +21,8 @@ window.onload = function(){
 
     document.addEventListener("keydown",keyPush);
     setInterval(game,1000/velocity);
+
+    DoExampleLoginWithCustomID();
 }
 
 nextRotation = 10;
@@ -56,6 +58,7 @@ function game() {
     for(var i = 0; i<trail.length;i++){
         ctx.fillRect(trail[i].x*gs,trail[i].y*gs,gs-2,gs-2);
         if(trail[i].x == px && trail[i].y == py) {
+            if(score>0) TrackPlayfabEvent("Death", score);
             tail = 5;
             score=0;
             nextRotation=10;
@@ -78,6 +81,7 @@ function game() {
             maxScore = score;
             maxScoreText.innerHTML = maxScore;
             scoreStorage.WriteMaxScore(maxScore);
+            TrackPlayfabEvent("BrokenScore", score);
         }
 
         //get current canvas rotation and add 10 degrees to it
