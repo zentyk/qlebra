@@ -177,6 +177,7 @@ function displayGameOver(){
 function resetGame(){
     score = 0;
     xVelocity = unitSize;
+    gameVelocity = 120;
     yVelocity = 0;
     snake = [
         {x:unitSize * 4, y:0},
