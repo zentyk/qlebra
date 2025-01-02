@@ -1,11 +1,11 @@
 version: "3"
 
-services: 
-    a-frame:
-        container_name: game
-        image: nginx:1.14.2-alpine
-        restart: always
-        ports:
-            - "80:80"
-        volumes:
-            - ./src:/usr/share/nginx/html:ro
+services:
+  LandingPage:
+    container_name: QLebraLanding
+    image: nginx:1.14.2-alpine
+    restart: always
+    ports:
+      - "81:80"
+    volumes:
+      - ./dist:/usr/share/nginx/html:ro
