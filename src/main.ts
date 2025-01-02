@@ -13,7 +13,8 @@ const snakeBorder = "green";
 const foodColor = "red";
 let unitSize = 15;
 let running = false;
-let xVelocity = 1;
+let gameVelocity = 120;
+let xVelocity = unitSize;
 let yVelocity = 0;
 let foodX: number;
 let foodY: number;
@@ -59,7 +60,7 @@ function nextTick(){
             drawSnake();
             checkGameOver();
             nextTick();
-        }, 75);
+        }, gameVelocity);
     }
     else{
         displayGameOver();
@@ -255,6 +256,7 @@ function HandleLevels(score: number){
     case 24:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 0, 255,0.5)";
+        gameVelocity = 110;
       }
       break;
     case 32:
@@ -270,6 +272,7 @@ function HandleLevels(score: number){
     case 48:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 255, 255,0.5)";
+        gameVelocity = 100;
       }
       break;
     case 56:
