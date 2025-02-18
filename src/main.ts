@@ -229,7 +229,24 @@ document.getElementById('rightBtn')?.addEventListener('click', () => {
 //#endregion
 
 //#region Levels
-function HandleLevels(score: number){ 
+function HandleLevels(score: number){
+  
+  switch(score){
+    case 2:
+      (gameBoard as HTMLElement).style.rotate = "45deg";
+      gameVelocity = 110;
+      break;
+    case 3:
+      (gameBoard as HTMLElement).style.rotate = "-45deg";
+      gameVelocity = 100;
+      break; 
+    case 4:
+      (gameBoard as HTMLElement).style.rotate = "0deg";
+      gameVelocity = 120;
+      break;
+
+  }
+
   if(score % 8 == 0){
     currentLevel+=2;
     (gameBoard as HTMLElement).style.rotate = `${currentLevel}deg`;
