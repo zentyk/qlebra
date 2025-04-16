@@ -30,8 +30,14 @@ let canPlay = false;
 let currentLevel = 0;
 
 window.addEventListener("keydown", changeDirection);
+
 if (resetBtn) {
     resetBtn.addEventListener("click", resetGame);
+    window.addEventListener("keydown", (event) => {
+        if (event.key === "Space" || event.key === "Enter") {
+            resetGame();
+        }
+    });
 }
 
 
@@ -70,7 +76,6 @@ function clearBoard(){
     ctx.fillStyle = boardBackground;
     ctx.fillRect(0, 0, gameWidth, gameHeight);
 };
-
 function createFood(){
     function randomFood(min: number, max: number){
         const randNum = Math.round((Math.random() * (max - min) + min) / unitSize) * unitSize;
@@ -111,7 +116,6 @@ function drawSnake(){
         ctx.strokeRect(snakePart.x, snakePart.y, unitSize, unitSize);
     })
 };
-
 function changeDirection(event: { keyCode: any; }){
   const keyPressed = event.keyCode;
   const LEFT = 37;
@@ -143,7 +147,6 @@ function changeDirection(event: { keyCode: any; }){
           break;
   }
 }
-
 function checkGameOver(){
     switch(true){
         case (snake[0].x < 0):
@@ -233,18 +236,38 @@ function HandleLevels(score: number){
   
   switch(score){
     case 2:
-      (gameBoard as HTMLElement).style.rotate = "45deg";
+      (gameBoard as HTMLElement).style.rotate = "1deg";
       gameVelocity = 110;
       break;
     case 3:
-      (gameBoard as HTMLElement).style.rotate = "-45deg";
+      (gameBoard as HTMLElement).style.rotate = "2deg";
       gameVelocity = 100;
       break; 
     case 4:
-      (gameBoard as HTMLElement).style.rotate = "0deg";
+      (gameBoard as HTMLElement).style.rotate = "3deg";
       gameVelocity = 120;
       break;
+    case 5:
+      (gameBoard as HTMLElement).style.rotate = "0deg";
+      gameVelocity = 130;
+      break;
 
+    case 6:
+      (gameBoard as HTMLElement).style.rotate = "-1deg";
+      gameVelocity = 140;
+      break;
+    case 7:
+      (gameBoard as HTMLElement).style.rotate = "-2deg";
+      gameVelocity = 150;
+      break;
+    case 8:
+      (gameBoard as HTMLElement).style.rotate = "-3deg";
+      gameVelocity = 160;
+      break;
+    case 9:
+      (gameBoard as HTMLElement).style.rotate = "0deg";
+      gameVelocity = 100;
+      break;
   }
 
   if(score % 8 == 0){
