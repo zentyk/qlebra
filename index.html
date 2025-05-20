@@ -99,6 +99,11 @@
     <footer>Q-lebra 2022-2025</footer>
     <script type="module" src="/src/main.ts"></script>
 
+    <script>
+      document.getElementById('resetBtn').addEventListener('click', function() {
+        fbq('track', 'StartTrial');
+      },false);
+    </script>
     <!-- Google tag (gtag.js) -->
      <script async src="https://www.googletagmanager.com/gtag/js?id=G-X4YXW4TNE2"></script>
      <script>
