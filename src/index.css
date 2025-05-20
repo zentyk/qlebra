@@ -9,6 +9,12 @@ body {
     height: 100vh;
 }
 
+#main #message {    
+    z-index: 9;
+    position: absolute;
+    top: 65%;
+}
+
 #gc{
     border-radius: 5px;
     box-shadow: 0 0 50px #5d2133;

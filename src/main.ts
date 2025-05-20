@@ -40,7 +40,6 @@ if (resetBtn) {
     });
 }
 
-
 function gameStart(){
   if(bgm){
     if(bgm.paused){
@@ -351,5 +350,33 @@ function HandleLevels(score: number){
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgb(134, 23, 123,0.5)";
       }
       break;
+  }
+}
+//#endregion
+
+let message = document.getElementById("message");
+
+if (message) {
+  console.log("Message element found");
+
+  setTimeout(function () {
+    fadeIn();
+  }, 1500);
+
+  function fadeIn() {
+    const intervalId = setInterval(function () {
+        if (!message.style.opacity) {
+            message.style.opacity = "1";
+        }
+        if (parseFloat(message.style.opacity) > 0) {
+            message.style.opacity = (parseFloat(message.style.opacity) - 0.1).toString();
+        } else {
+            clearInterval(intervalId);
+        }
+    }, 100);
+
+    setTimeout(function () {
+        message.style.display = "none";
+    }, 2000);
   }
 }
