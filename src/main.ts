@@ -8,7 +8,8 @@ const bgm : HTMLAudioElement =  document.querySelector("#bgm");
 const gameWidth = (gameBoard as HTMLCanvasElement).width ? (gameBoard as HTMLCanvasElement).width : 200;
 const gameHeight = (gameBoard as HTMLCanvasElement).height ? (gameBoard as HTMLCanvasElement).height : 200;
 let boardBackground = "black";
-const snakeColor = "black";
+const snakeColor = "#005500";
+let boardColor = "#003300";
 const snakeBorder = "green";
 const foodColor = "red";
 let unitSize = 10;
@@ -47,11 +48,11 @@ function gameStart(){
     }
   }
   (gameBoard as HTMLElement).style.rotate = "0deg";
-  boardBackground = "black";
+    boardBackground = "black";
     running= true;
     if (scoreText) {
         scoreText.textContent = score.toString();
-    }
+    } 
     createFood();
     drawFood();
     nextTick();
@@ -59,7 +60,8 @@ function gameStart(){
 function nextTick(){
     if(running){
         setTimeout(()=>{
-            clearBoard();
+            clearBoard(); 
+            drawBoard();
             drawFood();
             moveSnake();
             drawSnake();
@@ -75,6 +77,16 @@ function clearBoard(){
     ctx.fillStyle = boardBackground;
     ctx.fillRect(0, 0, gameWidth, gameHeight);
 };
+function drawBoard(){
+//draw a grid of 10x10
+            for(let i = 0; i < gameWidth; i+=unitSize){
+                ctx.strokeStyle = boardColor;
+                ctx.strokeRect(i, 0, unitSize, gameHeight);
+                ctx.strokeRect(0, i, gameWidth, unitSize);
+                ctx.strokeRect(i, gameHeight, unitSize, gameHeight);
+                ctx.strokeRect(gameWidth, i, gameWidth, unitSize);
+            }
+}
 function createFood(){
     function randomFood(min: number, max: number){
         const randNum = Math.round((Math.random() * (max - min) + min) / unitSize) * unitSize;
@@ -84,10 +96,11 @@ function createFood(){
     foodY = randomFood(0, gameWidth - unitSize);
 };
 function drawFood(){
-    ctx.fillStyle = 'black';
     ctx.strokeStyle = foodColor;
+    ctx.fillStyle = '#550000';
+
     ctx.fillRect(foodX, foodY, unitSize, unitSize);
-    ctx.strokeRect(foodX, foodY, unitSize, unitSize); 
+    ctx.strokeRect(foodX, foodY, unitSize, unitSize);  
 };
 function moveSnake(){
     const head = {x: snake[0].x + xVelocity,
@@ -110,7 +123,7 @@ function moveSnake(){
 function drawSnake(){
     ctx.fillStyle = snakeColor;
     ctx.strokeStyle = snakeBorder;
-    snake.forEach(snakePart => {
+    snake.forEach(snakePart => { 
         ctx.fillRect(snakePart.x, snakePart.y, unitSize, unitSize);
         ctx.strokeRect(snakePart.x, snakePart.y, unitSize, unitSize);
     })
@@ -250,7 +263,6 @@ function HandleLevels(score: number){
       (gameBoard as HTMLElement).style.rotate = "0deg";
       gameVelocity = 130;
       break;
-
     case 6:
       (gameBoard as HTMLElement).style.rotate = "-1deg";
       gameVelocity = 140;
@@ -278,76 +290,89 @@ function HandleLevels(score: number){
     case 2: 
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px #f3f3f3";
+        boardColor = "#333333";
       }
       break;
 
     case 8:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 0, 0, 0.5)";
- 
+        boardColor = "#330000";
       }
       break;
     
     case 16:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 255, 0,0.5)";
+        boardColor = "#003300";
       }
       break;
     case 24:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 0, 255,0.5)";
+        boardColor = "#000033";
         gameVelocity = 110;
       }
       break;
     case 32:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 255, 0,0.5)";
+        boardColor = "#333300";
       }
       break;
     case 40:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 0, 255,0.5)";
+        boardColor = "#330033";
       }
       break;
     case 48:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 255, 255,0.5)";
+        boardColor = "#003333";
         gameVelocity = 100;
       }
       break;
     case 56:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 255, 255,0.5)";
+        boardColor = "#333333";
       }
       break;
     case 64:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 0, 0,0.5)";
+        boardColor = "#111111";
       }
       break;
     case 72:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 0, 0,0.5)";
+        boardColor = "#330000";
       }
       break;
     case 80:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(12, 115, 0,0.5)";
+        boardColor = "#011110";
       }
       break;
     case 88:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(21, 245, 223,0.5)";
+        boardColor = "#15f1df";
       }
       break;
     case 96:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 255, 255,0.5)";
+        boardColor = "#111111";
       }
       break;
     case 104:
       if (gameBoard) {
         (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgb(134, 23, 123,0.5)";
+        boardColor = "#431332";
       }
       break;
   }
