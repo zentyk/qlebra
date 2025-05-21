@@ -49,8 +49,8 @@ header{
 #gamepad{
   margin-top: 1em;
   display: grid;
-  width: 150px;
-  height: 150px;  
+  width: 250px;
+  height: 250px;  
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr); 
 }
@@ -64,8 +64,8 @@ header{
 }
 
 .gamePadButton{
-  width: 50px;
-  height: 50px;
+  width: 75px;
+  height: 75px;
   background-color: transparent;
   border: none;
   cursor: pointer;
