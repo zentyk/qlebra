@@ -1,8 +1,12 @@
-import './style.css';
 import 'portebla/dist/portebla.css';
-import 'portebla';
+import './style.css';
+import porteblaCode from 'portebla/dist/portebla.js?raw';
 
 declare const fbq: any;
+
+const script = document.createElement('script');
+script.textContent = porteblaCode;
+document.head.appendChild(script);
 
 const Portebla = (window as any).Portebla?.Portebla;
 

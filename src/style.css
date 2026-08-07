@@ -46,7 +46,7 @@ header{
 #game{ 
   box-shadow: 0 0 10px 5px rgba(75, 180, 14, 0.5);  
   rotate: 0deg;
-  z-index: -10;
+  z-index: 10;
 }
 
 #gamepad{
