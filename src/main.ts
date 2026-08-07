@@ -1,9 +1,20 @@
 import './style.css'
 
+declare const fbq: any;
+
+const Portebla = (window as any).Portebla?.Portebla;
+
+const portebla = new Portebla({
+    container: document.getElementById('portebla-container'),
+    layout: 'portrait',
+    leftControl: 'dpad',
+    rightControl: 'buttons',
+    centerControl: 'menu'
+});
+
 const gameBoard = document.querySelector("#game");
 const ctx = (gameBoard as HTMLCanvasElement).getContext("2d");
 const scoreText = document.querySelector("#scoreText");
-const resetBtn = document.querySelector("#resetBtn");
 const bgm : HTMLAudioElement =  document.querySelector("#bgm");
 const gameWidth = (gameBoard as HTMLCanvasElement).width ? (gameBoard as HTMLCanvasElement).width : 200;
 const gameHeight = (gameBoard as HTMLCanvasElement).height ? (gameBoard as HTMLCanvasElement).height : 200;
@@ -27,21 +38,17 @@ let snake = [
     {x:unitSize, y:0},
     {x:0, y:0}
 ];
-let canPlay = false;
 let currentLevel = 0;
 
 window.addEventListener("keydown", changeDirection);
 
-let lastRenderTime = 0;
+window.addEventListener("keydown", (event) => {
+    if ((event.key === "Space" || event.key === "Enter") && !running) {
+        resetGame();
+    }
+});
 
-if (resetBtn) {
-    resetBtn.addEventListener("click", resetGame);
-    window.addEventListener("keydown", (event) => {
-        if ((event.key === "Space" || event.key === "Enter") && !running) {
-            resetGame();
-        }
-    });
-}
+let lastRenderTime = 0;
 
 function gameStart(){
   if(bgm){
@@ -52,18 +59,32 @@ function gameStart(){
   (gameBoard as HTMLElement).style.rotate = "0deg";
     boardBackground = "black";
     running= true;
+    lastRenderTime = performance.now();
     if (scoreText) {
         scoreText.textContent = score.toString();
     } 
     createFood();
     drawFood();
-    window.requestAnimationFrame(nextTick);
 };
-function nextTick(currentTime: number){
-    if(running){
-        window.requestAnimationFrame(nextTick);
-        const msSinceLastRender = currentTime - lastRenderTime;
-        if (msSinceLastRender < gameVelocity) return;
+
+function loop(currentTime: number){
+    window.requestAnimationFrame(loop);
+
+    if (!running) {
+        if (portebla.input.buttons.START?.justPressed || portebla.input.buttons.A?.justPressed) {
+            resetGame();
+        }
+        portebla.input.update();
+        return;
+    }
+
+    if (portebla.input.buttons.UP?.justPressed || portebla.input.buttons.UP?.pressed) changeDirection({keyCode: 38});
+    if (portebla.input.buttons.DOWN?.justPressed || portebla.input.buttons.DOWN?.pressed) changeDirection({keyCode: 40});
+    if (portebla.input.buttons.LEFT?.justPressed || portebla.input.buttons.LEFT?.pressed) changeDirection({keyCode: 37});
+    if (portebla.input.buttons.RIGHT?.justPressed || portebla.input.buttons.RIGHT?.pressed) changeDirection({keyCode: 39});
+
+    const msSinceLastRender = currentTime - lastRenderTime;
+    if (msSinceLastRender >= gameVelocity) {
         lastRenderTime = currentTime;
 
         clearBoard(); 
@@ -72,11 +93,13 @@ function nextTick(currentTime: number){
         moveSnake();
         drawSnake();
         checkGameOver();
+        if (!running) displayGameOver();
     }
-    else{
-        displayGameOver();
-    }
+
+    portebla.input.update();
 };
+
+window.requestAnimationFrame(loop);
 function clearBoard(){
     ctx.fillStyle = boardBackground;
     ctx.fillRect(0, 0, gameWidth, gameHeight);
@@ -190,10 +213,10 @@ function displayGameOver(){
     ctx.textAlign = "center";
     ctx.fillText("GAME OVER!", gameWidth / 2, gameHeight / 2);
     running = false;
-    canPlay = false;
-    handleInputs(canPlay);
 };
 function resetGame(){
+    if (typeof fbq !== 'undefined') fbq('track', 'StartTrial');
+
     score = 0;
     xVelocity = unitSize;
     gameVelocity = 120;
@@ -206,52 +229,7 @@ function resetGame(){
         {x:0, y:0}
     ];
     gameStart();
-    canPlay = true;
-    handleInputs(canPlay);
 };
-
-gameOver();
-
-function gameOver(){
-  handleInputs(canPlay);
-}
-
-function handleInputs(toPlay: boolean){
-  const upBtn = document.getElementById('upBtn');
-  const downBtn = document.getElementById('downBtn');
-  const leftBtn = document.getElementById('leftBtn');
-  const rightBtn = document.getElementById('rightBtn');
-  const resetBtnEl = document.getElementById('resetBtn');
-
-  if(toPlay){
-    if(upBtn) upBtn.style.display = 'block'; 
-    if(downBtn) downBtn.style.display = 'block';
-    if(leftBtn) leftBtn.style.display = 'block';
-    if(rightBtn) rightBtn.style.display = 'block';
-    if(resetBtnEl) resetBtnEl.style.display = 'none';
-  } else {
-    if(upBtn) upBtn.style.display = 'none'; 
-    if(downBtn) downBtn.style.display = 'none';
-    if(leftBtn) leftBtn.style.display = 'none';
-    if(rightBtn) rightBtn.style.display = 'none';
-    if(resetBtnEl) resetBtnEl.style.display = 'block';
-  }
-}
-
-//#region Inputs
-document.getElementById('upBtn')?.addEventListener('click', () => {
-  changeDirection({keyCode: 38});  
-})
-document.getElementById('downBtn')?.addEventListener('click', () => {
-  changeDirection({keyCode: 40});
-})
-document.getElementById('leftBtn')?.addEventListener('click', () => {
-  changeDirection({keyCode: 37});
-})
-document.getElementById('rightBtn')?.addEventListener('click', () => {
-  changeDirection({keyCode: 39});
-})
-//#endregion
 
 //#region Levels
 const levelSettings: Record<number, { rotate?: string, velocity?: number, shadow?: string, boardColor?: string }> = {

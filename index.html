@@ -63,6 +63,8 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
 <!-- TikTok Pixel Code End -->
 
     <title>Q-Lebra</title>
+    <link rel="stylesheet" href="/node_modules/portebla/dist/portebla.css">
+    <script src="/node_modules/portebla/dist/portebla.js"></script>
   </head>
   <body>
 <!-- Meta Pixel Code -->
@@ -95,39 +97,12 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
         </p>
         <img src="./src/qlebraDfLogo.png" alt="">
       </div>
-      <section id="gamepad"> 
-        <div class="gridItem"></div>
-        <div class="gridItem" >
-          <button class="gamePadButton" id="upBtn"></button>
-        </div>
-        <div class="gridItem"></div>
-        <div class="gridItem">
-          <button class="gamePadButton" id="leftBtn"></button>
-        </div>
-        <div class="gridItem">
-          <button class="gamePadButton" id="resetBtn">
-            <img src="src/PlayButton.svg" alt="">
-          </button>
-        </div>
-        <div class="gridItem">
-          <button class="gamePadButton" id="rightBtn"></button>
-        </div>
-        <div class="gridItem"></div>
-        <div class="gridItem">
-          <button class="gamePadButton" id="downBtn"></button>
-        </div>
-        <div class="gridItem"></div>
-      </section>
+      <div id="portebla-container"></div>
     </div>
     <footer>Q-lebra 2022-2025</footer>
     <script type="module" src="/src/main.ts"></script>
 
-    <script>
-      document.getElementById('resetBtn').addEventListener('click', function() {
-        fbq('track', 'StartTrial');
-      },false);
-    </script>
-    
+
     <!-- Google tag (gtag.js) -->
      <script async src="https://www.googletagmanager.com/gtag/js?id=G-X4YXW4TNE2"></script>
      <script>
