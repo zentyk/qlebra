@@ -32,10 +32,12 @@ let currentLevel = 0;
 
 window.addEventListener("keydown", changeDirection);
 
+let lastRenderTime = 0;
+
 if (resetBtn) {
     resetBtn.addEventListener("click", resetGame);
     window.addEventListener("keydown", (event) => {
-        if (event.key === "Space" || event.key === "Enter") {
+        if ((event.key === "Space" || event.key === "Enter") && !running) {
             resetGame();
         }
     });
@@ -55,19 +57,21 @@ function gameStart(){
     } 
     createFood();
     drawFood();
-    nextTick();
+    window.requestAnimationFrame(nextTick);
 };
-function nextTick(){
+function nextTick(currentTime: number){
     if(running){
-        setTimeout(()=>{
-            clearBoard(); 
-            drawBoard();
-            drawFood();
-            moveSnake();
-            drawSnake();
-            checkGameOver();
-            nextTick();
-        }, gameVelocity);
+        window.requestAnimationFrame(nextTick);
+        const msSinceLastRender = currentTime - lastRenderTime;
+        if (msSinceLastRender < gameVelocity) return;
+        lastRenderTime = currentTime;
+
+        clearBoard(); 
+        drawBoard();
+        drawFood();
+        moveSnake();
+        drawSnake();
+        checkGameOver();
     }
     else{
         displayGameOver();
@@ -213,18 +217,24 @@ function gameOver(){
 }
 
 function handleInputs(toPlay: boolean){
+  const upBtn = document.getElementById('upBtn');
+  const downBtn = document.getElementById('downBtn');
+  const leftBtn = document.getElementById('leftBtn');
+  const rightBtn = document.getElementById('rightBtn');
+  const resetBtnEl = document.getElementById('resetBtn');
+
   if(toPlay){
-    document.getElementById('upBtn').style.display = 'block'; 
-    document.getElementById('downBtn').style.display = 'block';
-    document.getElementById('leftBtn').style.display = 'block';
-    document.getElementById('rightBtn').style.display = 'block';
-    document.getElementById('resetBtn').style.display = 'none';
+    if(upBtn) upBtn.style.display = 'block'; 
+    if(downBtn) downBtn.style.display = 'block';
+    if(leftBtn) leftBtn.style.display = 'block';
+    if(rightBtn) rightBtn.style.display = 'block';
+    if(resetBtnEl) resetBtnEl.style.display = 'none';
   } else {
-    document.getElementById('upBtn').style.display = 'none'; 
-    document.getElementById('downBtn').style.display = 'none';
-    document.getElementById('leftBtn').style.display = 'none';
-    document.getElementById('rightBtn').style.display = 'none';
-    document.getElementById('resetBtn').style.display = 'block';
+    if(upBtn) upBtn.style.display = 'none'; 
+    if(downBtn) downBtn.style.display = 'none';
+    if(leftBtn) leftBtn.style.display = 'none';
+    if(rightBtn) rightBtn.style.display = 'none';
+    if(resetBtnEl) resetBtnEl.style.display = 'block';
   }
 }
 
@@ -244,137 +254,41 @@ document.getElementById('rightBtn')?.addEventListener('click', () => {
 //#endregion
 
 //#region Levels
+const levelSettings: Record<number, { rotate?: string, velocity?: number, shadow?: string, boardColor?: string }> = {
+  2: { rotate: "1deg", velocity: 110, shadow: "0px 0px 10px 10px #f3f3f3", boardColor: "#333333" },
+  3: { rotate: "2deg", velocity: 100 },
+  4: { rotate: "3deg", velocity: 120 },
+  5: { rotate: "0deg", velocity: 130 },
+  6: { rotate: "-1deg", velocity: 140 },
+  7: { rotate: "-2deg", velocity: 150 },
+  8: { rotate: "-3deg", velocity: 160, shadow: "0px 0px 10px 10px rgba(255, 0, 0, 0.5)", boardColor: "#330000" },
+  9: { rotate: "0deg", velocity: 100 },
+  16: { shadow: "0px 0px 10px 10px rgba(0, 255, 0,0.5)", boardColor: "#003300" },
+  24: { velocity: 110, shadow: "0px 0px 10px 10px rgba(0, 0, 255,0.5)", boardColor: "#000033" },
+  32: { shadow: "0px 0px 10px 10px rgba(255, 255, 0,0.5)", boardColor: "#333300" },
+  40: { shadow: "0px 0px 10px 10px rgba(255, 0, 255,0.5)", boardColor: "#330033" },
+  48: { velocity: 100, shadow: "0px 0px 10px 10px rgba(0, 255, 255,0.5)", boardColor: "#003333" },
+  56: { shadow: "0px 0px 10px 10px rgba(255, 255, 255,0.5)", boardColor: "#333333" },
+  64: { shadow: "0px 0px 10px 10px rgba(0, 0, 0,0.5)", boardColor: "#111111" },
+  72: { shadow: "0px 0px 10px 10px rgba(255, 0, 0,0.5)", boardColor: "#330000" },
+  80: { shadow: "0px 0px 10px 10px rgba(12, 115, 0,0.5)", boardColor: "#011110" },
+  88: { shadow: "0px 0px 10px 10px rgba(21, 245, 223,0.5)", boardColor: "#15f1df" },
+  96: { shadow: "0px 0px 10px 10px rgba(255, 255, 255,0.5)", boardColor: "#111111" },
+  104: { shadow: "0px 0px 10px 10px rgb(134, 23, 123,0.5)", boardColor: "#431332" },
+};
+
 function HandleLevels(score: number){
-  
-  switch(score){
-    case 2:
-      (gameBoard as HTMLElement).style.rotate = "1deg";
-      gameVelocity = 110;
-      break;
-    case 3:
-      (gameBoard as HTMLElement).style.rotate = "2deg";
-      gameVelocity = 100;
-      break; 
-    case 4:
-      (gameBoard as HTMLElement).style.rotate = "3deg";
-      gameVelocity = 120;
-      break;
-    case 5:
-      (gameBoard as HTMLElement).style.rotate = "0deg";
-      gameVelocity = 130;
-      break;
-    case 6:
-      (gameBoard as HTMLElement).style.rotate = "-1deg";
-      gameVelocity = 140;
-      break;
-    case 7:
-      (gameBoard as HTMLElement).style.rotate = "-2deg";
-      gameVelocity = 150;
-      break;
-    case 8:
-      (gameBoard as HTMLElement).style.rotate = "-3deg";
-      gameVelocity = 160;
-      break;
-    case 9:
-      (gameBoard as HTMLElement).style.rotate = "0deg";
-      gameVelocity = 100;
-      break;
+  const settings = levelSettings[score];
+  if (settings) {
+    if (settings.rotate) (gameBoard as HTMLElement).style.rotate = settings.rotate;
+    if (settings.velocity) gameVelocity = settings.velocity;
+    if (settings.shadow && gameBoard) (gameBoard as HTMLCanvasElement).style.boxShadow = settings.shadow;
+    if (settings.boardColor) boardColor = settings.boardColor;
   }
 
   if(score % 8 == 0){
     currentLevel+=2;
     (gameBoard as HTMLElement).style.rotate = `${currentLevel}deg`;
-  }
-
-  switch(score){
-    case 2: 
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px #f3f3f3";
-        boardColor = "#333333";
-      }
-      break;
-
-    case 8:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 0, 0, 0.5)";
-        boardColor = "#330000";
-      }
-      break;
-    
-    case 16:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 255, 0,0.5)";
-        boardColor = "#003300";
-      }
-      break;
-    case 24:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 0, 255,0.5)";
-        boardColor = "#000033";
-        gameVelocity = 110;
-      }
-      break;
-    case 32:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 255, 0,0.5)";
-        boardColor = "#333300";
-      }
-      break;
-    case 40:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 0, 255,0.5)";
-        boardColor = "#330033";
-      }
-      break;
-    case 48:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 255, 255,0.5)";
-        boardColor = "#003333";
-        gameVelocity = 100;
-      }
-      break;
-    case 56:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 255, 255,0.5)";
-        boardColor = "#333333";
-      }
-      break;
-    case 64:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(0, 0, 0,0.5)";
-        boardColor = "#111111";
-      }
-      break;
-    case 72:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 0, 0,0.5)";
-        boardColor = "#330000";
-      }
-      break;
-    case 80:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(12, 115, 0,0.5)";
-        boardColor = "#011110";
-      }
-      break;
-    case 88:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(21, 245, 223,0.5)";
-        boardColor = "#15f1df";
-      }
-      break;
-    case 96:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgba(255, 255, 255,0.5)";
-        boardColor = "#111111";
-      }
-      break;
-    case 104:
-      if (gameBoard) {
-        (gameBoard as HTMLCanvasElement).style.boxShadow = "0px 0px 10px 10px rgb(134, 23, 123,0.5)";
-        boardColor = "#431332";
-      }
-      break;
   }
 }
 //#endregion
@@ -385,15 +299,15 @@ if (message) {
   console.log("Message element found");
 
   setTimeout(function () {
-    fadeIn();
+    fadeOut();
   }, 1500);
 
-  function fadeIn() {
+  function fadeOut() {
     const intervalId = setInterval(function () {
-        if (!message.style.opacity) {
+        if (message && !message.style.opacity) {
             message.style.opacity = "1";
         }
-        if (parseFloat(message.style.opacity) > 0) {
+        if (message && parseFloat(message.style.opacity) > 0) {
             message.style.opacity = (parseFloat(message.style.opacity) - 0.1).toString();
         } else {
             clearInterval(intervalId);
@@ -401,7 +315,7 @@ if (message) {
     }, 100);
 
     setTimeout(function () {
-        message.style.display = "none";
+        if (message) message.style.display = "none";
     }, 2000);
   }
 }
