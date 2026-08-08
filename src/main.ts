@@ -1,6 +1,7 @@
 import 'portebla/dist/portebla.css';
 import './style.css';
 import porteblaCode from 'portebla/dist/portebla.js?raw';
+import { audioManager } from './audio';
 
 declare const fbq: any;
 
@@ -21,7 +22,6 @@ const portebla = new Portebla({
 const gameBoard = document.querySelector("#game");
 const ctx = (gameBoard as HTMLCanvasElement).getContext("2d");
 const scoreText = document.querySelector("#scoreText");
-const bgm : HTMLAudioElement =  document.querySelector("#bgm");
 const gameWidth = (gameBoard as HTMLCanvasElement).width ? (gameBoard as HTMLCanvasElement).width : 200;
 const gameHeight = (gameBoard as HTMLCanvasElement).height ? (gameBoard as HTMLCanvasElement).height : 200;
 let boardBackground = "black";
@@ -37,6 +37,15 @@ let xVelocity = unitSize;
 let yVelocity = 0;
 let foodX: number;
 let foodY: number;
+
+const FOOD_NORMAL = 0;
+const FOOD_INVINCIBLE = 1;
+const FOOD_MULTIPLIER = 2;
+let currentFoodType = FOOD_NORMAL;
+
+let invincibleUntil = 0;
+let multiplierUntil = 0;
+
 let score = 0;
 let snake = [
     {x:unitSize * 4, y:0},
@@ -58,15 +67,13 @@ window.addEventListener("keydown", (event) => {
 let lastRenderTime = 0;
 
 function gameStart(){
-  if(bgm){
-    if(bgm.paused){
-      bgm.play();
-    }
-  }
+  audioManager.play();
   (gameBoard as HTMLElement).style.rotate = "0deg";
     boardBackground = "black";
     running = true;
     isPaused = false;
+    invincibleUntil = 0;
+    multiplierUntil = 0;
     lastRenderTime = performance.now();
     if (scoreText) {
         scoreText.textContent = score.toString();
@@ -164,10 +171,25 @@ function createFood(){
     }
     foodX = randomFood(0, gameWidth - unitSize);
     foodY = randomFood(0, gameWidth - unitSize);
+
+    const rand = Math.random();
+    if (rand < 0.1) currentFoodType = FOOD_INVINCIBLE;
+    else if (rand < 0.2) currentFoodType = FOOD_MULTIPLIER;
+    else currentFoodType = FOOD_NORMAL;
 };
 function drawFood(){
-    ctx.strokeStyle = foodColor;
-    ctx.fillStyle = '#550000';
+    let stroke = foodColor;
+    let fill = '#550000';
+    if (currentFoodType === FOOD_INVINCIBLE) {
+        stroke = 'cyan';
+        fill = '#005555';
+    } else if (currentFoodType === FOOD_MULTIPLIER) {
+        stroke = 'gold';
+        fill = '#555500';
+    }
+    
+    ctx.strokeStyle = stroke;
+    ctx.fillStyle = fill;
 
     ctx.fillRect(foodX, foodY, unitSize, unitSize);
     ctx.strokeRect(foodX, foodY, unitSize, unitSize);  
@@ -179,7 +201,15 @@ function moveSnake(){
     snake.unshift(head);
     //if food is eaten
     if(snake[0].x == foodX && snake[0].y == foodY){
-        score+=1;
+        const points = (multiplierUntil > performance.now()) ? 3 : 1;
+        score += points;
+        
+        if (currentFoodType === FOOD_INVINCIBLE) {
+            invincibleUntil = performance.now() + 5000;
+        } else if (currentFoodType === FOOD_MULTIPLIER) {
+            multiplierUntil = performance.now() + 5000;
+        }
+
         HandleLevels(score);
         if (scoreText) {
             scoreText.textContent = score.toString();
@@ -191,9 +221,16 @@ function moveSnake(){
     }     
 };
 function drawSnake(){
-    ctx.fillStyle = snakeColor;
-    ctx.strokeStyle = snakeBorder;
-    snake.forEach(snakePart => { 
+    const isInvincible = invincibleUntil > performance.now();
+    const isMultiplier = multiplierUntil > performance.now();
+    
+    ctx.fillStyle = isInvincible ? "#00ffff" : snakeColor;
+    ctx.strokeStyle = isInvincible ? "white" : (isMultiplier ? "gold" : snakeBorder);
+    
+    snake.forEach((snakePart, index) => { 
+        if (isInvincible && index % 2 === 0) ctx.fillStyle = "white"; // Pulsing effect
+        else ctx.fillStyle = isInvincible ? "#00aaaa" : snakeColor;
+        
         ctx.fillRect(snakePart.x, snakePart.y, unitSize, unitSize);
         ctx.strokeRect(snakePart.x, snakePart.y, unitSize, unitSize);
     })
@@ -230,23 +267,33 @@ function changeDirection(event: { keyCode: any; }){
   }
 }
 function checkGameOver(){
-    switch(true){
-        case (snake[0].x < 0):
-            running = false;
-            break;
-        case (snake[0].x >= gameWidth):
-            running = false;
-            break;
-        case (snake[0].y < 0):
-            running = false;
-            break;
-        case (snake[0].y >= gameHeight):
+    const isInvincible = invincibleUntil > performance.now();
+
+    if (isInvincible) {
+        if (snake[0].x < 0) snake[0].x = gameWidth - unitSize;
+        else if (snake[0].x >= gameWidth) snake[0].x = 0;
+        
+        if (snake[0].y < 0) snake[0].y = gameHeight - unitSize;
+        else if (snake[0].y >= gameHeight) snake[0].y = 0;
+    } else {
+        switch(true){
+            case (snake[0].x < 0):
                 running = false;
                 break;
-    }
-    for(let i = 1; i < snake.length; i+=1){
-        if(snake[i].x == snake[0].x && snake[i].y == snake[0].y){
-            running = false;
+            case (snake[0].x >= gameWidth):
+                running = false;
+                break;
+            case (snake[0].y < 0):
+                running = false;
+                break;
+            case (snake[0].y >= gameHeight):
+                running = false;
+                break;
+        }
+        for(let i = 1; i < snake.length; i+=1){
+            if(snake[i].x == snake[0].x && snake[i].y == snake[0].y){
+                running = false;
+            }
         }
     }
 };
