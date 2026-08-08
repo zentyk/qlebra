@@ -49,6 +49,9 @@ let multiplierUntil = 0;
 let walls: {x: number, y: number}[] = [];
 let wallStage = 0;
 
+let particles: {x: number, y: number, vx: number, vy: number, life: number, color: string}[] = [];
+let shakeFrames = 0;
+
 let score = 0;
 let snake = [
     {x:unitSize * 4, y:0},
@@ -145,8 +148,20 @@ function loop(currentTime: number){
         drawFood();
         moveSnake();
         drawSnake();
+        drawParticles();
         checkGameOver();
-        if (!running) displayGameOver();
+        if (!running) {
+            shakeFrames = 15;
+            displayGameOver();
+        }
+    }
+
+    if (shakeFrames > 0) {
+        shakeFrames--;
+        const dx = (Math.random() - 0.5) * 10;
+        const dy = (Math.random() - 0.5) * 10;
+        if (gameBoard) (gameBoard as HTMLElement).style.transform = `translate(${dx}px, ${dy}px)`;
+        if (shakeFrames === 0 && gameBoard) (gameBoard as HTMLElement).style.transform = `translate(0px, 0px)`;
     }
 
     portebla.input.update();
@@ -154,23 +169,30 @@ function loop(currentTime: number){
 
 window.requestAnimationFrame(loop);
 function clearBoard(){
+    ctx.globalAlpha = 0.3; // Motion Trails
     ctx.fillStyle = boardBackground;
     ctx.fillRect(0, 0, gameWidth, gameHeight);
+    ctx.globalAlpha = 1.0;
 };
 function drawBoard(){
 //draw a grid of 10x10
             for(let i = 0; i < gameWidth; i+=unitSize){
                 ctx.strokeStyle = boardColor;
+                ctx.shadowBlur = 0;
                 ctx.strokeRect(i, 0, unitSize, gameHeight);
                 ctx.strokeRect(0, i, gameWidth, unitSize);
                 ctx.strokeRect(i, gameHeight, unitSize, gameHeight);
                 ctx.strokeRect(gameWidth, i, gameWidth, unitSize);
             }
     ctx.fillStyle = '#555555';
+    ctx.strokeStyle = '#aaaaaa';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#555555';
     walls.forEach(w => {
         ctx.fillRect(w.x, w.y, unitSize, unitSize);
         ctx.strokeRect(w.x, w.y, unitSize, unitSize);
     });
+    ctx.shadowBlur = 0;
 }
 function createFood(){
     function randomFood(min: number, max: number){
@@ -210,9 +232,12 @@ function drawFood(){
     
     ctx.strokeStyle = stroke;
     ctx.fillStyle = fill;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = stroke;
 
     ctx.fillRect(foodX, foodY, unitSize, unitSize);
     ctx.strokeRect(foodX, foodY, unitSize, unitSize);  
+    ctx.shadowBlur = 0;
 };
 function moveSnake(){
     const head = {x: snake[0].x + xVelocity,
@@ -224,6 +249,18 @@ function moveSnake(){
         const points = (multiplierUntil > performance.now()) ? 3 : 1;
         score += points;
         
+        // Spawn Particles
+        for(let i = 0; i < 15; i++) {
+            particles.push({
+                x: foodX + unitSize/2,
+                y: foodY + unitSize/2,
+                vx: (Math.random() - 0.5) * 10,
+                vy: (Math.random() - 0.5) * 10,
+                life: 1.0,
+                color: currentFoodType === FOOD_INVINCIBLE ? 'cyan' : (currentFoodType === FOOD_MULTIPLIER ? 'gold' : foodColor)
+            });
+        }
+
         if (currentFoodType === FOOD_INVINCIBLE) {
             invincibleUntil = performance.now() + 5000;
         } else if (currentFoodType === FOOD_MULTIPLIER) {
@@ -240,12 +277,33 @@ function moveSnake(){
         snake.pop();
     }     
 };
+
+function drawParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.05;
+        
+        if (p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+        }
+        
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 3, 3);
+    }
+    ctx.globalAlpha = 1.0;
+}
 function drawSnake(){
     const isInvincible = invincibleUntil > performance.now();
     const isMultiplier = multiplierUntil > performance.now();
     
     ctx.fillStyle = isInvincible ? "#00ffff" : snakeColor;
     ctx.strokeStyle = isInvincible ? "white" : (isMultiplier ? "gold" : snakeBorder);
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = ctx.strokeStyle;
     
     snake.forEach((snakePart, index) => { 
         if (isInvincible && index % 2 === 0) ctx.fillStyle = "white"; // Pulsing effect
@@ -254,6 +312,7 @@ function drawSnake(){
         ctx.fillRect(snakePart.x, snakePart.y, unitSize, unitSize);
         ctx.strokeRect(snakePart.x, snakePart.y, unitSize, unitSize);
     })
+    ctx.shadowBlur = 0;
 };
 function changeDirection(event: { keyCode: any; }){
   const keyPressed = event.keyCode;
@@ -345,6 +404,7 @@ function resetGame(){
     gameVelocity = 120;
     yVelocity = 0;
     walls = [];
+    particles = [];
     wallStage = 0;
     snake = [
         {x:unitSize * 4, y:0},
