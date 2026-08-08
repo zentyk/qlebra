@@ -46,6 +46,9 @@ let currentFoodType = FOOD_NORMAL;
 let invincibleUntil = 0;
 let multiplierUntil = 0;
 
+let walls: {x: number, y: number}[] = [];
+let wallStage = 0;
+
 let score = 0;
 let snake = [
     {x:unitSize * 4, y:0},
@@ -163,14 +166,31 @@ function drawBoard(){
                 ctx.strokeRect(i, gameHeight, unitSize, gameHeight);
                 ctx.strokeRect(gameWidth, i, gameWidth, unitSize);
             }
+    ctx.fillStyle = '#555555';
+    walls.forEach(w => {
+        ctx.fillRect(w.x, w.y, unitSize, unitSize);
+        ctx.strokeRect(w.x, w.y, unitSize, unitSize);
+    });
 }
 function createFood(){
     function randomFood(min: number, max: number){
         const randNum = Math.round((Math.random() * (max - min) + min) / unitSize) * unitSize;
         return randNum;
     }
-    foodX = randomFood(0, gameWidth - unitSize);
-    foodY = randomFood(0, gameWidth - unitSize);
+    
+    let isOccupied = true;
+    while(isOccupied) {
+        foodX = randomFood(0, gameWidth - unitSize);
+        foodY = randomFood(0, gameHeight - unitSize);
+        isOccupied = false;
+        
+        for (const w of walls) {
+            if (w.x === foodX && w.y === foodY) isOccupied = true;
+        }
+        for (const s of snake) {
+            if (s.x === foodX && s.y === foodY) isOccupied = true;
+        }
+    }
 
     const rand = Math.random();
     if (rand < 0.1) currentFoodType = FOOD_INVINCIBLE;
@@ -295,6 +315,11 @@ function checkGameOver(){
                 running = false;
             }
         }
+        for(let i = 0; i < walls.length; i+=1){
+            if(walls[i].x == snake[0].x && walls[i].y == snake[0].y){
+                running = false;
+            }
+        }
     }
 };
 function displayGameOver(){
@@ -319,6 +344,8 @@ function resetGame(){
     xVelocity = unitSize;
     gameVelocity = 120;
     yVelocity = 0;
+    walls = [];
+    wallStage = 0;
     snake = [
         {x:unitSize * 4, y:0},
         {x:unitSize * 3, y:0},
@@ -365,6 +392,31 @@ function HandleLevels(score: number){
   if(score % 8 == 0){
     currentLevel+=2;
     (gameBoard as HTMLElement).style.rotate = `${currentLevel}deg`;
+  }
+
+  // Wall Progression
+  if (score >= 10 && wallStage === 0) {
+      wallStage = 1;
+      // Center vertical line
+      for (let i = 40; i < 160; i += unitSize) walls.push({x: 100, y: i});
+  }
+  if (score >= 20 && wallStage === 1) {
+      wallStage = 2;
+      // Add horizontal side pieces
+      for (let i = 20; i < 70; i += unitSize) {
+          walls.push({x: i, y: 100});
+          walls.push({x: 200 - i - unitSize, y: 100});
+      }
+  }
+  if (score >= 30 && wallStage === 2) {
+      wallStage = 3;
+      // Add corners
+      for (let i = 20; i < 60; i += unitSize) {
+          walls.push({x: i, y: 20});
+          walls.push({x: 200 - i - unitSize, y: 20});
+          walls.push({x: i, y: 200 - 20 - unitSize});
+          walls.push({x: 200 - i - unitSize, y: 200 - 20 - unitSize});
+      }
   }
 }
 //#endregion
