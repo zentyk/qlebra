@@ -31,6 +31,7 @@ const snakeBorder = "green";
 const foodColor = "red";
 let unitSize = 10;
 let running = false;
+let isPaused = false;
 let gameVelocity = 60;
 let xVelocity = unitSize;
 let yVelocity = 0;
@@ -64,7 +65,8 @@ function gameStart(){
   }
   (gameBoard as HTMLElement).style.rotate = "0deg";
     boardBackground = "black";
-    running= true;
+    running = true;
+    isPaused = false;
     lastRenderTime = performance.now();
     if (scoreText) {
         scoreText.textContent = score.toString();
@@ -84,13 +86,33 @@ function loop(currentTime: number){
         return;
     }
 
+    if (portebla.input.buttons.START?.justPressed || portebla.input.buttons.SELECT?.justPressed) {
+        isPaused = !isPaused;
+        if (isPaused) displayPaused();
+        else {
+            lastRenderTime = currentTime; // Prevent time jump
+            clearBoard();
+            drawBoard();
+            drawFood();
+            drawSnake();
+        }
+    }
+
+    if (isPaused) {
+        portebla.input.update();
+        return;
+    }
+
     if (portebla.input.buttons.UP?.justPressed || portebla.input.buttons.UP?.pressed) changeDirection({keyCode: 38});
     if (portebla.input.buttons.DOWN?.justPressed || portebla.input.buttons.DOWN?.pressed) changeDirection({keyCode: 40});
     if (portebla.input.buttons.LEFT?.justPressed || portebla.input.buttons.LEFT?.pressed) changeDirection({keyCode: 37});
     if (portebla.input.buttons.RIGHT?.justPressed || portebla.input.buttons.RIGHT?.pressed) changeDirection({keyCode: 39});
 
+    const isBoosting = portebla.input.buttons.B?.pressed || portebla.input.buttons.A?.pressed;
+    const effectiveVelocity = isBoosting ? gameVelocity / 2.5 : gameVelocity;
+
     const msSinceLastRender = currentTime - lastRenderTime;
-    if (msSinceLastRender >= gameVelocity) {
+    if (msSinceLastRender >= effectiveVelocity) {
         lastRenderTime = currentTime;
 
         clearBoard(); 
@@ -219,6 +241,14 @@ function displayGameOver(){
     ctx.textAlign = "center";
     ctx.fillText("GAME OVER!", gameWidth / 2, gameHeight / 2);
     running = false;
+};
+function displayPaused(){
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, gameWidth, gameHeight);
+    ctx.font = "25px MV Boli";
+    ctx.fillStyle = "White";
+    ctx.textAlign = "center";
+    ctx.fillText("PAUSED", gameWidth / 2, gameHeight / 2);
 };
 function resetGame(){
     if (typeof fbq !== 'undefined') fbq('track', 'StartTrial');
