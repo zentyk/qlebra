@@ -108,8 +108,23 @@ function loop(currentTime: number){
     if (portebla.input.buttons.LEFT?.justPressed || portebla.input.buttons.LEFT?.pressed) changeDirection({keyCode: 37});
     if (portebla.input.buttons.RIGHT?.justPressed || portebla.input.buttons.RIGHT?.pressed) changeDirection({keyCode: 39});
 
+    // Mechanic: Tail Cut (X button) - Cuts 5 segments off the tail to save space, keeping the score!
+    if (portebla.input.buttons.X?.justPressed) {
+        if (snake.length > 10) {
+            snake.splice(snake.length - 5, 5);
+            // Flash board color to indicate success
+            const oldColor = boardBackground;
+            boardBackground = "#330033";
+            setTimeout(() => { boardBackground = oldColor; }, 150);
+        }
+    }
+
     const isBoosting = portebla.input.buttons.B?.pressed || portebla.input.buttons.A?.pressed;
-    const effectiveVelocity = isBoosting ? gameVelocity / 2.5 : gameVelocity;
+    const isFocusing = portebla.input.buttons.Y?.pressed; // Mechanic: Focus (Y button) - Slows down time
+    
+    let effectiveVelocity = gameVelocity;
+    if (isBoosting) effectiveVelocity = gameVelocity / 2.5;
+    else if (isFocusing) effectiveVelocity = gameVelocity * 2;
 
     const msSinceLastRender = currentTime - lastRenderTime;
     if (msSinceLastRender >= effectiveVelocity) {
