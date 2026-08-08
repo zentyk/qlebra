@@ -52,7 +52,23 @@ export class AudioManager {
         this.nextAudio.muted = this.isMuted;
         
         this.nextAudio.addEventListener('timeupdate', () => this.handleTimeUpdate());
-        this.nextAudio.play().catch(e => console.error("Audio play failed:", e));
+        this.nextAudio.play().catch(e => {
+            console.warn("Audio autoplay blocked by browser. Waiting for interaction...", e);
+            // Bulletproof fallback: Wait for any click/touch and force play
+            const retryPlay = () => {
+                if (this.nextAudio) {
+                    this.nextAudio.play().catch(() => {});
+                } else if (this.currentAudio) {
+                    this.currentAudio.play().catch(() => {});
+                }
+                window.removeEventListener('click', retryPlay);
+                window.removeEventListener('touchstart', retryPlay);
+                window.removeEventListener('keydown', retryPlay);
+            };
+            window.addEventListener('click', retryPlay, { once: true });
+            window.addEventListener('touchstart', retryPlay, { once: true });
+            window.addEventListener('keydown', retryPlay, { once: true });
+        });
 
         if (doCrossfade && this.currentAudio) {
             this.crossfading = true;
