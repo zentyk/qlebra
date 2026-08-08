@@ -12,7 +12,26 @@ export class AudioManager {
     private crossfading = false;
     private isMuted = false;
 
-    constructor() {}
+    private unlocked = false;
+
+    constructor() {
+        const unlock = () => {
+            if (this.unlocked) return;
+            
+            // Play a silent base64 audio to unlock the browser's audio engine on first interaction
+            const silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+            silentAudio.play().then(() => {
+                silentAudio.pause();
+                this.unlocked = true;
+                window.removeEventListener('click', unlock);
+                window.removeEventListener('touchstart', unlock);
+            }).catch(() => {});
+        };
+        
+        window.addEventListener('click', unlock, { once: true });
+        window.addEventListener('touchstart', unlock, { once: true });
+        window.addEventListener('keydown', unlock, { once: true });
+    }
 
     public play() {
         if (this.isPlaying) return;
