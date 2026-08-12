@@ -19,13 +19,16 @@ const portebla = new Portebla({
     centerControl: 'menu'
 });
 
-window.addEventListener('touchstart', (e) => {
+const handleVibrate = (e: Event) => {
     // Catch touches inside the portebla controller before they are consumed
     const container = document.getElementById('portebla-container');
     if (container && container.contains(e.target as Node)) {
         if (navigator.vibrate) navigator.vibrate(15);
     }
-}, { capture: true, passive: true });
+};
+
+window.addEventListener('touchstart', handleVibrate, { capture: true, passive: true });
+window.addEventListener('pointerdown', handleVibrate, { capture: true, passive: true });
 
 const gameBoard = document.querySelector("#game");
 const ctx = (gameBoard as HTMLCanvasElement).getContext("2d");
