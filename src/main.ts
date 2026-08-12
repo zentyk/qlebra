@@ -19,6 +19,14 @@ const portebla = new Portebla({
     centerControl: 'menu'
 });
 
+window.addEventListener('touchstart', (e) => {
+    // Catch touches inside the portebla controller before they are consumed
+    const container = document.getElementById('portebla-container');
+    if (container && container.contains(e.target as Node)) {
+        if (navigator.vibrate) navigator.vibrate(15);
+    }
+}, { capture: true, passive: true });
+
 const gameBoard = document.querySelector("#game");
 const ctx = (gameBoard as HTMLCanvasElement).getContext("2d");
 const scoreText = document.querySelector("#scoreText");
@@ -162,13 +170,6 @@ function loop(currentTime: number){
         const dy = (Math.random() - 0.5) * 10;
         if (gameBoard) (gameBoard as HTMLElement).style.transform = `translate(${dx}px, ${dy}px)`;
         if (shakeFrames === 0 && gameBoard) (gameBoard as HTMLElement).style.transform = `translate(0px, 0px)`;
-    }
-
-    if (navigator.vibrate) {
-        const anyJustPressed = Object.values(portebla.input.buttons).some((b: any) => b.justPressed);
-        if (anyJustPressed) {
-            navigator.vibrate(15);
-        }
     }
 
     portebla.input.update();
