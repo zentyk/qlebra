@@ -165,7 +165,7 @@ function loop(currentTime: number){
     }
 
     if (navigator.vibrate) {
-        const anyJustPressed = Object.values(portebla.input.buttons).some(b => b.justPressed);
+        const anyJustPressed = Object.values(portebla.input.buttons).some((b: any) => b.justPressed);
         if (anyJustPressed) {
             navigator.vibrate(15);
         }
