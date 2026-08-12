@@ -19,30 +19,9 @@ const portebla = new Portebla({
     centerControl: 'menu'
 });
 
-const handleVibrate = (e: Event) => {
-    // Catch touches inside the portebla controller before they are consumed
-    const container = document.getElementById('portebla-container');
-    if (container && container.contains(e.target as Node)) {
-        if (navigator.vibrate) navigator.vibrate([50]);
-    }
-};
-
-window.addEventListener('touchstart', handleVibrate, { capture: true, passive: true });
-window.addEventListener('pointerdown', handleVibrate, { capture: true, passive: true });
-
 const gameBoard = document.querySelector("#game");
 const ctx = (gameBoard as HTMLCanvasElement).getContext("2d");
 const scoreText = document.querySelector("#scoreText");
-
-const debugDiv = document.createElement("div");
-debugDiv.style.position = "absolute";
-debugDiv.style.top = "10px";
-debugDiv.style.left = "10px";
-debugDiv.style.color = "lime";
-debugDiv.style.zIndex = "9999";
-debugDiv.style.fontFamily = "monospace";
-debugDiv.textContent = navigator.vibrate ? "Vibration API: Supported" : "Vibration API: NOT Supported";
-document.body.appendChild(debugDiv);
 
 const gameWidth = (gameBoard as HTMLCanvasElement).width ? (gameBoard as HTMLCanvasElement).width : 200;
 const gameHeight = (gameBoard as HTMLCanvasElement).height ? (gameBoard as HTMLCanvasElement).height : 200;
