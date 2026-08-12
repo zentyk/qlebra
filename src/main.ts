@@ -164,6 +164,13 @@ function loop(currentTime: number){
         if (shakeFrames === 0 && gameBoard) (gameBoard as HTMLElement).style.transform = `translate(0px, 0px)`;
     }
 
+    if (navigator.vibrate) {
+        const anyJustPressed = Object.values(portebla.input.buttons).some(b => b.justPressed);
+        if (anyJustPressed) {
+            navigator.vibrate(15);
+        }
+    }
+
     portebla.input.update();
 };
 
